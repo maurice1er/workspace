@@ -1,0 +1,56 @@
+---
+- name: provision_docker
+  hosts: all
+  become: true
+
+  tasks:
+
+    - name: Installing docker related dependencies
+      yum:   
+        name: "{{ item }}"
+        state: latest
+      loop:
+        - yum-utils
+        - device-mapper-persistent-data
+        - lvm2
+        - python-pip
+        - python3-pip
+
+    - name: Configuring docker-ce repo
+      get_url:
+        url: https://download.docker.com/linux/centos/docker-ce.repo
+        dest: /etc/yum.repos.d/docker-ce.repo
+        mode: 0644
+
+    - name: Installing docker
+      yum:   
+        name: "{{ item }}"
+        state: latest
+      loop:
+        - docker-ce
+        - docker-ce-cli 
+        - containerd.io
+
+    - name: Starting and Enabling Docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Install docker python package 
+      pip3:
+        name: docker 
+
+    - name: Build an image and push
+      docker_image:
+        name: nginx:latest
+        tag: v1
+
+    - name: Setting up the nginx container 
+      docker_container:
+        name: nginx
+        image: nginx:latest
+        state: started
+        restart: yes
+        ports:
+        - "8088:80"

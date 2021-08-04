@@ -1,0 +1,32 @@
+# THIS DOES NOT WORK!
+Vagrant.configure('2') do |config|
+
+    config.vm.box = "generic/centos7" # "ubuntu/trusty64"
+    config.vm.hostname = "yara-dev"
+    config.vm.network "public_network"
+    # config.vm.network :private_network, ip: "192.168.1.42"
+
+    config.vm.provider "virtualbox" do |vb|
+      vb.gui = true
+      vb.customize ['modifyvm', :id, '--name', 'yara-dev']
+      vb.memory = "1024" # RAM 1Go
+    end
+    
+
+    # config.vm.synced_folder "ansible", "/home/vagrant"
+    config.vm.synced_folder '.', '/home/vagrant/', disabled: true, type:'virtualbox'
+
+    # config.vm.provision :shell, path: "shell/update.sh"
+
+
+
+    # config.vm.provision :shell, inline: <<-SHELL
+    #   yum install ansible -y
+    # SHELL
+
+    # config.vm.provision :ansible do |ansible|
+    #   ansible.verbose = "v"
+    #   ansible.playbook = "ansible/playbook-install-docker.yml"
+    # end
+
+end
